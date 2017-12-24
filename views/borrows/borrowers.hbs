@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <title>Library</title>
+</head>
+<body class="container">
+    <nav class="navbar navbar-expand-sm navbar-light bg-light">
+        <a class="navbar-brand" href="/">MyBook</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/books">Books</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link disabled" href="/borrows">Borrows</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col-9">
+                <div class="row">
+                    {{#unless borrowers}}
+                    <div class="col-9 mt-3 ml-3">
+                        <h5>No Borrowers Available!</h5>
+                    </div>
+                    {{/unless}}
+                    {{#each borrowers}}
+                    <div class="col-11 offset-1 mt-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">{{this.borName}}</h4>
+                                <h6 class="card-subtitle mb-2 text-muted">{{this.department}}</h6>
+                                <p class="card-text">Address:  {{this.address}},</p>
+                                <p class="card-text">Pohne Number: {{this.phoneNum}}</p>
+                                {{!-- <a href="#" class="card-link">Card link</a>
+                                <a href="#" class="card-link">Another link</a> --}}
+                            </div>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+            <div class="col-3 mt-3">
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/borrows">Borrows</a>
+                    <a class="nav-link" href="/newborrow">New Borrow</a>
+                    <a class="nav-link active" href="/borrowers">Borrowers</a>
+                    <a class="nav-link" href="/newborrower">New Borrower</a>
+                </nav>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
