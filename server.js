@@ -5,6 +5,8 @@ const hbs = require ('hbs');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
+const moment = require('moment');
+
 /*-----------------------------Data Base Connection and HandShake------------------------*/
 
 const connection = mysql.createConnection({
@@ -22,9 +24,16 @@ connection.connect((err)=> {
 /*----------------------------------Handlebar Helpers------------------------------------*/
 
 hbs.registerHelper('borrowStatus', (status)=>{
-    return (status === 1)? 'still borrowed' : 'returned';
+    return (status === 1)? 'on loan' : 'availabe';
 })
 
+hbs.registerHelper('borrowClass', (status)=>{
+    return (status === 1)? 'warning' : 'success';
+})
+
+hbs.registerHelper('getDate', (date)=>{
+    return Date.format('MMMM Do YYYY, h:mm:ss a');
+})
 
 /*----------------------------------App Server Middlewear--------------------------------*/
 const authenticate = (request, response, next)=>{
@@ -86,7 +95,11 @@ app.listen(port, ()=>{
 
 /*******HOME PAGE**********/
 app.get('/', authenticate, (request, response)=>{
-    response.render('home');
+    connection.query(`SELECT emplName FROM employee WHERE emplID=${request.cookies.user.emplID}`,
+        (err, result)=>{
+            response.render('home', {emplName: result[0].emplName});
+        });
+    
 });
 
 
@@ -94,7 +107,7 @@ app.get('/', authenticate, (request, response)=>{
 
 app.get('/books',authenticate, (request, response)=>{
     // response.render('books');
-    connection.query(`SELECT bookName, authName, creationYear FROM writebook JOIN book ON writebook.bookID=book.bookID 
+    connection.query(`SELECT bookName, authName, creationYear, bookStatus FROM writebook JOIN book ON writebook.bookID=book.bookID 
     JOIN author ON writebook.authID=author.authID;`, (err, result, fields)=>{
         if (err) throw err;
         response.render('books/books',{books: result});
@@ -146,7 +159,7 @@ app.post('/newauthor', authenticate, (request, response)=>{
                 if (err) throw err;
                 connection.query(`INSERT INTO authorphone VALUES (\'${request.body.phoneNum}\', ${author.insertId})`, 
                 (err, done)=>{
-                    console.log(done);
+                    // console.log(done);
                     response.redirect('/authors');
                 }); 
             })
@@ -173,12 +186,12 @@ app.get('/newborrow', authenticate, getBorrowers, getBooks, (request, response)=
 
 app.post('/newborrow', authenticate, (request, response)=>{
     const user = request.cookies.user;
-    const time = new Date().getTime();
+    const time = moment().format('MMMM Do YYYY, h:mm:ss');
 
-    connection.query(`INSERT INTO borrowbook (bookID, emplID, borwID, borrowAt) VALUES (${request.body.bookID}, ${user.emplID}, ${request.body.borwID}, ${time})`,
+    connection.query(`INSERT INTO borrowbook (bookID, emplID, borwID, borrowAt) VALUES (${request.body.bookID}, ${user.emplID}, ${request.body.borwID}, \'${time}\')`,
         (err, result)=>{
             if (err) throw err
-            console.log(result.insertId);
+            // console.log(result.insertId);
             connection.query(`UPDATE book SET bookStatus=1 WHERE bookID=${request.body.bookID};`,
                 (err, done)=>{
                     if(err) throw err;
@@ -189,7 +202,7 @@ app.post('/newborrow', authenticate, (request, response)=>{
 
 app.get('/borrowers', authenticate, (request, response)=>{
     connection.query(`SELECT * FROM borrower JOIN borrowerphone on borrowerphone.borwID=borrower.borwID;`, (err, result)=>{
-        console.log(result)
+        // console.log(result)
         response.render('borrows/borrowers', {borrowers: result});        
     });
 });
