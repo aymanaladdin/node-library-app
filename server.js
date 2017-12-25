@@ -31,8 +31,8 @@ hbs.registerHelper('borrowClass', (status)=>{
     return (status === 1)? 'warning' : 'success';
 })
 
-hbs.registerHelper('getDate', (date)=>{
-    return Date.format('MMMM Do YYYY, h:mm:ss a');
+hbs.registerHelper('isRetrieved', (status)=>{
+    return (status === 1)? false: true;
 })
 
 /*----------------------------------App Server Middlewear--------------------------------*/
@@ -138,7 +138,7 @@ app.post('/newbook', authenticate, (request, response)=>{
 });
 
 app.get('/authors', authenticate, (request, response)=>{
-    connection.query('SELECT * FROM author', (err, result, fields)=>{
+    connection.query('SELECT * FROM author JOIN authorphone on authorphone.authID=author.authID', (err, result, fields)=>{
         if (err) throw err;
         response.render('books/authors',{authors: result});
     })
@@ -173,10 +173,18 @@ app.post('/newauthor', authenticate, (request, response)=>{
     /*******BORROWS PAGE**********/
 
 app.get('/borrows', authenticate, (request, response)=>{
-    connection.query(`select bookName, emplName, borName, borrowAt, bookStatus from borrowbook join book on book.bookID=borrowbook.bookID join employee on employee.emplID=borrowbook.emplID join borrower on borrower.borwID=borrowbook.borwID;`
+    connection.query(`select * from borrowbook join book on book.bookID=borrowbook.bookID join employee on employee.emplID=borrowbook.emplID join borrower on borrower.borwID=borrowbook.borwID;`
         ,(err, rows, fields)=>{
             response.render('borrows/borrows', {borrows: rows});
         });
+});
+
+app.get('/retreive/:id', (request, response)=>{
+    connection.query(`UPDATE book SET bookStatus=0 WHERE bookID=${request.params.id};`,
+    (err, done)=>{
+        if(err) throw err;
+        response.redirect('/borrows');
+    });
 });
 
 app.get('/newborrow', authenticate, getBorrowers, getBooks, (request, response)=>{

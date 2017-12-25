@@ -8,7 +8,7 @@
     <title>Library</title>
 </head>
 <body class="container">
-    <nav class="navbar navbar-expand-sm navbar-light bg-light">
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
         <a class="navbar-brand" href="/">MyBook</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -37,17 +37,18 @@
                     </div>
                     {{/unless}}
                     {{#each authors}}
-                    <div class="col-11 offset-1 mt-3">
+                    <div class="col-9 offset-2 mt-3">
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title">{{this.authName}}</h4>
-                                <h6 class="card-subtitle mb-2 text-muted">{{this.Adress}}</h6>
-                                <p class="card-text">this author had published xx books</p>
-                                {{!-- <a href="#" class="card-link">Card link</a>
-                                <a href="#" class="card-link">Another link</a> --}}
+                                <p class="card-subtitle mb-1 mt-2"> <small class="text-muted">Address |</small> {{this.Adress}}</p>
                             </div>
+                            <ul class="list-group list-group-flush mt">
+                                <li class="list-group-item d-flex justify-content-between align-items-center"><small class="text-muted"> Pohne Number</small> <span class="badge badge-pill badge-info">{{this.phoneNum}}</span></li>
+                            </ul>
                         </div>
                     </div>
+                    {{!-- <p class="card-text">this author had published xx books</p> --}}
                     {{/each}}
                 </div>
             </div>
